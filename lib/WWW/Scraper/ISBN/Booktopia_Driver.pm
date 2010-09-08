@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 #--------------------------------------------------------------------------
 
@@ -94,13 +94,19 @@ sub search {
     return $self->handler("Booktopia website appears to be unavailable.")
 	    if($@ || !$mech->success() || !$mech->content());
 
+    my $pattern = $isbn;
+    if(length $isbn == 10) {
+        $pattern = '978' . $isbn;
+        $pattern =~ s/.$/./;
+    }
+
     my $content = $mech->content;
-    my ($link) = $content =~ m!"($BAU_URL2$isbn$BAU_URL3)"!s;
+    my ($link) = $content =~ m!"($BAU_URL2$pattern$BAU_URL3)"!s;
 	return $self->handler("Failed to find that book on Booktopia website.")
 	    unless($link);
 
 #print STDERR "\n# content1=[\n$content\n]\n";
-#print STDERR "\n# link1=[$BAU_URL2$isbn$BAU_URL3]\n";
+#print STDERR "\n# link1=[$BAU_URL2$pattern$BAU_URL3]\n";
 #print STDERR "\n# link2=[$BAU_URL1$link]\n";
 
     eval { $mech->get( $BAU_URL1 . $link ) };
@@ -116,28 +122,28 @@ sub search {
 #print STDERR "\n# content2=[\n$html\n]\n";
 
     my $data;
-    ($data->{publisher})                = $html =~ m!<span class="bold">\s*Publisher:\s*</span>\s*([^<]+)!i;
-    ($data->{pubdate})                  = $html =~ m!<span class="bold">\s*Published:\s*</span>\s*([^<]+)!i;
+    ($data->{publisher})                = $html =~ m!<span class="bold">\s*Publisher:\s*</span>\s*([^<]+)!si;
+    ($data->{pubdate})                  = $html =~ m!<span class="bold">\s*Published:\s*</span>\s*([^<]+)!si;
 
     $data->{publisher} =~ s!<[^>]+>!!g  if($data->{publisher});
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
 
-    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!i;
-    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!i;
-    ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!i;
-    ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!i;
-    ($data->{author})                   = $html =~ m!<span class="bold">By:\s*</span>((?:<a href="/search.ep\?author=[^"]+">[^<]+</a>[,\s]*)+)<br/>!i;
-    ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!i;
-    ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!i  unless($data->{title});
-    ($data->{description})              = $html =~ m!<div id="product-description">(.*?)</div>\s*<div id="(?:details|extract)"!s;
-    ($data->{description})              = $html =~ m!<h4>Description:</h4>([^<]+)!  unless($data->{description});
-    ($data->{binding})                  = $html =~ m!<b>Format:\s*</b>([^<]+)!s;
-    ($data->{pages})                    = $html =~ m!<b>\s*Number Of Pages:\s*</b>\s*([\d.]+)!s;
-    ($data->{weight})                   = $html =~ m!<span class="bold">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!s;
-    ($data->{height},$data->{width})    = $html =~ m!<span class="bold">\s*Dimensions \(cm\):\s*</span>([\d.]+)&nbsp;x&nbsp;([\d.]+)!s;
+    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!si;
+    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!si;
+    ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
+    ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
+    ($data->{author})                   = $html =~ m!<span class="bold">By:\s*</span>((?:<a href="/search.ep\?author=[^"]+">[^<]+</a>[,\s]*)+)<br/>!si;
+    ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!si;
+    ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!si  unless($data->{title});
+    ($data->{description})              = $html =~ m!<div id="product-description">(.*?)</div>\s*<div id="(?:details|extract)"!si;
+    ($data->{description})              = $html =~ m!<h4>Description:</h4>([^<]+)!si  unless($data->{description});
+    ($data->{binding})                  = $html =~ m!<b>Format:\s*</b>([^<]+)!si;
+    ($data->{pages})                    = $html =~ m!<b>\s*Number Of Pages:\s*</b>\s*([\d.]+)!si;
+    ($data->{weight})                   = $html =~ m!<span class="bold">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!si;
+    ($data->{height},$data->{width})    = $html =~ m!<span class="bold">\s*Dimensions \(cm\):\s*</span>([\d.]+)&nbsp;x&nbsp;([\d.]+)!si;
 
-    $data->{weight} = int($data->{weight} * 1000)   if($data->{weight});
+    #$data->{weight} = int($data->{weight} * 1000)   if($data->{weight});   # despite it saying Kg (kilogrammes) the weight given is in grammes!
     $data->{height} = int($data->{height} * 10)     if($data->{height});
     $data->{width}  = int($data->{width}  * 10)     if($data->{width});
 

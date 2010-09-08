@@ -1,4 +1,9 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.02	08/09/2010
+        - weight is actually given in grammes not kilogrammes as stated.
+        - all matches are now case insensitive.
+        - fixed support for ISBN10 searches.
+
 0.01	30/07/2010
         - initial release
