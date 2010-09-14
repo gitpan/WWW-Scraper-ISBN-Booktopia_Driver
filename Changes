@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.03	14/09/2010
+        - protect against amending undefined strings.
+
 0.02	08/09/2010
         - weight is actually given in grammes not kilogrammes as stated.
         - all matches are now case insensitive.

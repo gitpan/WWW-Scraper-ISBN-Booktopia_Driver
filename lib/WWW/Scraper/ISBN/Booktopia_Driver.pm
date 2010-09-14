@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 #--------------------------------------------------------------------------
 
@@ -147,13 +147,15 @@ sub search {
     $data->{height} = int($data->{height} * 10)     if($data->{height});
     $data->{width}  = int($data->{width}  * 10)     if($data->{width});
 
-    $data->{author} =~ s!<[^>]+>!!g;
-    $data->{description} =~ s!<div.*?</div>!!s;
-    $data->{description} =~ s!<a .*!!s;
-    $data->{description} =~ s!</?b>!!g;
-    $data->{description} =~ s!<br\s*/>!\n!g;
-    $data->{description} =~ s! +$!!gm;
-    $data->{description} =~ s!\n\n!\n!gs;
+    $data->{author} =~ s!<[^>]+>!!g if($data->{author});
+    if($data->{description}) {
+        $data->{description} =~ s!<div.*?</div>!!s;
+        $data->{description} =~ s!<a .*!!s;
+        $data->{description} =~ s!</?b>!!g;
+        $data->{description} =~ s!<br\s*/>!\n!g;
+        $data->{description} =~ s! +$!!gm;
+        $data->{description} =~ s!\n\n!\n!gs;
+    }
 
 #use Data::Dumper;
 #print STDERR "\n# " . Dumper($data);
