@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.04    15/09/2010
+        - reworked test structure, so easier to add sample sets.
+
 0.03	14/09/2010
         - protect against amending undefined strings.
 
