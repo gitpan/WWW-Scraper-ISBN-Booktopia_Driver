@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 #--------------------------------------------------------------------------
 
@@ -51,8 +51,8 @@ my ($BAU_URL1,$BAU_URL2,$BAU_URL3) = ('http://www.booktopia.com.au','/[^/]+/prod
 
 =item C<search()>
 
-Creates a query string, then passes the appropriate form fields to the Booktopia
-server.
+Creates a query string, then passes the appropriate form fields to the 
+Booktopia server.
 
 The returned page should be the correct catalog page for that ISBN. If not the
 function returns zero and allows the next driver in the chain to have a go. If
@@ -129,11 +129,11 @@ sub search {
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
 
-    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!si;
-    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/\d+.jpg)!si;
+    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au(?:/big)?/\d+/\d+/\d+.jpg)!si;
+    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au\.?/\d+/\d+/\d+.jpg)!si;
     ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
     ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
-    ($data->{author})                   = $html =~ m!<span class="bold">By:\s*</span>((?:<a href="/search.ep\?author=[^"]+">[^<]+</a>[,\s]*)+)<br/>!si;
+    ($data->{author})                   = $html =~ m!<span class="bold">(?:By|Author):\s*</span>((?:<a href="/search.ep\?author=[^"]+">[^<]+</a>[,\s]*)+)<br/>!si;
     ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!si;
     ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!si  unless($data->{title});
     ($data->{description})              = $html =~ m!<div id="product-description">(.*?)</div>\s*<div id="(?:details|extract)"!si;
