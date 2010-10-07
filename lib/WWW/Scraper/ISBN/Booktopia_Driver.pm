@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 #--------------------------------------------------------------------------
 
@@ -143,7 +143,14 @@ sub search {
     ($data->{weight})                   = $html =~ m!<span class="bold">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!si;
     ($data->{height},$data->{width})    = $html =~ m!<span class="bold">\s*Dimensions \(cm\):\s*</span>([\d.]+)&nbsp;x&nbsp;([\d.]+)!si;
 
-    #$data->{weight} = int($data->{weight} * 1000)   if($data->{weight});   # despite it saying Kg (kilogrammes) the weight given is in grammes!
+    # despite it saying Kg (kilogrammes) the weight seems to vary between widely!
+    if($data->{weight}) {
+        if(   $data->{weight} < 1)      {$data->{weight} = int($data->{weight} * 1000)} 
+        elsif($data->{weight} < 100)    {$data->{weight} = int($data->{weight} * 10)}
+        elsif($data->{weight} < 1000)   {$data->{weight} = int($data->{weight})}
+        else                            {$data->{weight} = int($data->{weight})}
+    }
+    
     $data->{height} = int($data->{height} * 10)     if($data->{height});
     $data->{width}  = int($data->{width}  * 10)     if($data->{width});
 

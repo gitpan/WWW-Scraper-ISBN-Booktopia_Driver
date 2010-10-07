@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.06    07/10/2010
+        - further fixes due to changes in page layout.
+        - adapted code to cope with weird weights.
+        - amended pingtest() in network tests.
+
 0.05    06/10/2010
         - fixed skip count.
         - provided alternate ping test methods.

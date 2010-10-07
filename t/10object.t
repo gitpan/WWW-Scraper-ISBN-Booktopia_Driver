@@ -35,15 +35,15 @@ my %tests = (
         [ 'is',     'isbn10',       '0718155890'                ],
         [ 'is',     'isbn13',       '9780718155896'             ],
         [ 'is',     'ean13',        '9780718155896'             ],
-        [ 'is',     'author',       q|Clive Cussler, Justin Scott|          ],
+        [ 'like',   'author',       qr|Cussler|                 ],
         [ 'is',     'title',        q|The Spy : An Isaac Bell Adventure|    ],
         [ 'is',     'publisher',    'Penguin Books, Limited'    ],
         [ 'is',     'pubdate',      '31st May 2010'             ],
         [ 'is',     'binding',      'Paperback'                 ],
-        [ 'is',     'pages',        undef                       ],
+        [ 'is',     'pages',        436                         ],
         [ 'is',     'width',        152                         ],
         [ 'is',     'height',       230                         ],
-        [ 'is',     'weight',       undef                       ],
+        [ 'is',     'weight',       231                         ],
         [ 'like',   'image_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'description',  qr|international tensions are mounting as the world plunges towards war| ],
@@ -125,8 +125,12 @@ sub pingtest {
                 $^O =~ /dos|os2|mswin32|netware|cygwin/i    ? "ping -n 1 $domain "
                                                             : "ping -c 1 $domain >/dev/null 2>&1";
 
-    system($cmd);
-    my $retcode = $? >> 8;
-    # ping returns 1 if unable to connect
+    eval { system($cmd) }; 
+    if($@) {                # can't find ping, or wrong arguments?
+        diag();
+        return 1;
+    }
+
+    my $retcode = $? >> 8;  # ping returns 1 if unable to connect
     return $retcode;
 }
