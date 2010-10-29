@@ -52,9 +52,9 @@ my %tests = (
  
     '9781408307557' => [
         [ 'is',     'pages',        undef                       ],
-        [ 'is',     'width',        137                         ],
-        [ 'is',     'height',       207                         ],
-        [ 'is',     'weight',       157                         ],
+        [ 'is',     'width',        128                         ],
+        [ 'is',     'height',       206                         ],
+        [ 'is',     'weight',       150                         ],
     ],
 );
 

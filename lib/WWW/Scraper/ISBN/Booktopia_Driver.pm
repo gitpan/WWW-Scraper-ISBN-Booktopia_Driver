@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 #--------------------------------------------------------------------------
 
@@ -128,12 +128,11 @@ sub search {
     $data->{publisher} =~ s!<[^>]+>!!g  if($data->{publisher});
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
-
     ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au(?:/big)?/\d+/\d+/\d+.jpg)!si;
     ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au\.?/\d+/\d+/\d+.jpg)!si;
     ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
     ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
-    ($data->{author})                   = $html =~ m!<span class="bold">(?:By|Author):\s*</span>((?:<a href="/search.ep\?author=[^"]+">[^<]+</a>[,\s]*)+)<br/>!si;
+    ($data->{author})                   = $html =~ m!<span class="bold">(?:By|Author):\s*</span><span style="color:#FFFFFF">((?:<a[^>]+href="/search.ep\?author=[^"]+"[^>]*>[^<]+</a>[,\s]*)+)</span><br/>!si;
     ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!si;
     ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!si  unless($data->{title});
     ($data->{description})              = $html =~ m!<div id="product-description">(.*?)</div>\s*<div id="(?:details|extract)"!si;
