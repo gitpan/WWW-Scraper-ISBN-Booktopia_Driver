@@ -46,7 +46,7 @@ my %tests = (
         [ 'is',     'weight',       231                         ],
         [ 'like',   'image_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780718155896.jpg|       ],
-        [ 'like',   'description',  qr|international tensions are mounting as the world plunges towards war| ],
+        [ 'like',   'description',  qr|international tensions are mounting| ],
         [ 'like',   'book_link',    qr|http://www.booktopia.com.au/the-spy-an-isaac-bell-adventure/prod9780718155896.html| ],
     ],
  
@@ -92,6 +92,8 @@ SKIP: {
         SKIP: {
             skip "Website unavailable", scalar(@{ $tests{$isbn} }) + 2   
                 if($error =~ /website appears to be unavailable/);
+            skip "Book unavailable", scalar(@{ $tests{$isbn} }) + 2   
+                if($error =~ /Failed to find that book/ || !$record->found);
 
             unless($record->found) {
                 diag($record->error);
