@@ -19,7 +19,7 @@ my %tests = (
         [ 'like',   'author',       qr/Simon Ball/              ],
         [ 'is',     'title',        q|Bitter Sea|               ],
         [ 'is',     'publisher',    'HarperCollins Publishers Limited'  ],
-        [ 'is',     'pubdate',      '1st April 2010'                    ],
+        [ 'is',     'pubdate',      '22nd June 2010'            ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        undef                       ],
         [ 'is',     'width',        132                         ],
@@ -27,7 +27,7 @@ my %tests = (
         [ 'is',     'weight',       321                         ],
         [ 'like',   'image_link',   qr|9780007203055.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780007203055.jpg|       ],
-        [ 'like',   'description',  qr|The Mediterranean was indeed|    ],
+        [ 'like',   'description',  qr|A gripping history of the Mediterranean campaigns|   ],
         [ 'like',   'book_link',    qr|http://www.booktopia.com.au/bitter-sea/prod9780007203055.html|   ]
     ],
     '0718155890' => [
