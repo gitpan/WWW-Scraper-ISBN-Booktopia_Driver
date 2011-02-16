@@ -19,7 +19,7 @@ my %tests = (
         [ 'like',   'author',       qr/Simon Ball/              ],
         [ 'is',     'title',        q|Bitter Sea|               ],
         [ 'is',     'publisher',    'HarperCollins Publishers Limited'  ],
-        [ 'is',     'pubdate',      '22nd June 2010'            ],
+        [ 'like',   'pubdate',      qr/2010/                    ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        undef                       ],
         [ 'is',     'width',        132                         ],
