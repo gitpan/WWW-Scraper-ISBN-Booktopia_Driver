@@ -41,9 +41,9 @@ my %tests = (
         [ 'is',     'pubdate',      '31st May 2010'             ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        436                         ],
-        [ 'is',     'width',        152                         ],
-        [ 'is',     'height',       230                         ],
-        [ 'is',     'weight',       231                         ],
+        [ 'is',     'width',        157                         ],
+        [ 'is',     'height',       233                         ],
+        [ 'is',     'weight',       588                         ],
         [ 'like',   'image_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'description',  qr|international tensions are mounting| ],
@@ -52,9 +52,9 @@ my %tests = (
  
     '9781408307557' => [
         [ 'is',     'pages',        undef                       ],
-        [ 'is',     'width',        128                         ],
-        [ 'is',     'height',       206                         ],
-        [ 'is',     'weight',       150                         ],
+        [ 'is',     'width',        137                         ],
+        [ 'is',     'height',       207                         ],
+        [ 'is',     'weight',       157                         ],
     ],
 );
 

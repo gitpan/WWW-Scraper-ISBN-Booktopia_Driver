@@ -1,11 +1,14 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.11    14/03/2011
+        - updated tests due to data change.
+
 0.10    16/02/2011
         - upgraded to Test::CPAN::Meta::JSON for tests.
-        - updated test due to data change.
+        - updated tests due to data change.
 
 0.09    14/02/2011
-        - updated test due to data change.
+        - updated tests due to data change.
 
 0.08    03/11/2010
         - added further skip test if test books are withdrawn from the site.
