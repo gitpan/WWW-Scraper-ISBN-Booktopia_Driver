@@ -22,9 +22,9 @@ my %tests = (
         [ 'like',   'pubdate',      qr/2010/                    ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        undef                       ],
-        [ 'is',     'width',        132                         ],
-        [ 'is',     'height',       197                         ],
-        [ 'is',     'weight',       321                         ],
+        [ 'like',   'width',        qr/\d+/                     ],
+        [ 'like',   'height',       qr/\d+/                     ],
+        [ 'like',   'weight',       qr/\d+/                     ],
         [ 'like',   'image_link',   qr|9780007203055.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780007203055.jpg|       ],
         [ 'like',   'description',  qr|A gripping history of the Mediterranean campaigns|   ],
@@ -41,9 +41,9 @@ my %tests = (
         [ 'is',     'pubdate',      '31st May 2010'             ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        436                         ],
-        [ 'is',     'width',        157                         ],
-        [ 'is',     'height',       233                         ],
-        [ 'is',     'weight',       588                         ],
+        [ 'like',   'width',        qr/\d+/                     ],
+        [ 'like',   'height',       qr/\d+/                     ],
+        [ 'like',   'weight',       qr/\d+/                     ],
         [ 'like',   'image_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'thumb_link',   qr|9780718155896.jpg|       ],
         [ 'like',   'description',  qr|international tensions are mounting| ],
@@ -52,9 +52,9 @@ my %tests = (
  
     '9781408307557' => [
         [ 'is',     'pages',        undef                       ],
-        [ 'is',     'width',        137                         ],
-        [ 'is',     'height',       207                         ],
-        [ 'is',     'weight',       157                         ],
+        [ 'like',   'width',        qr/\d+/                     ],
+        [ 'like',   'height',       qr/\d+/                     ],
+        [ 'like',   'weight',       qr/\d+/                     ],
     ],
 );
 
