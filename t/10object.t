@@ -2,7 +2,7 @@
 use strict;
 
 use lib './t';
-use Test::More tests => 46;
+use Test::More tests => 51;
 use WWW::Scraper::ISBN;
 
 ###########################################################
@@ -25,36 +25,40 @@ my %tests = (
         [ 'like',   'width',        qr/\d+/                     ],
         [ 'like',   'height',       qr/\d+/                     ],
         [ 'like',   'weight',       qr/\d+/                     ],
-        [ 'like',   'image_link',   qr|9780007203055.jpg|       ],
-        [ 'like',   'thumb_link',   qr|9780007203055.jpg|       ],
+        [ 'like',   'image_link',   qr|bitter-sea.jpg|          ],
+        [ 'like',   'thumb_link',   qr|bitter-sea.jpg|          ],
         [ 'like',   'description',  qr|A gripping history of the Mediterranean campaigns|   ],
         [ 'like',   'book_link',    qr|http://www.booktopia.com.au/bitter-sea/prod9780007203055.html|   ]
     ],
-    '0718155890' => [
-        [ 'is',     'isbn',         '9780718155896'             ],
-        [ 'is',     'isbn10',       '0718155890'                ],
-        [ 'is',     'isbn13',       '9780718155896'             ],
-        [ 'is',     'ean13',        '9780718155896'             ],
-        [ 'like',   'author',       qr|Cussler|                 ],
-        [ 'is',     'title',        q|The Spy : An Isaac Bell Adventure|    ],
-        [ 'is',     'publisher',    'Penguin Books, Limited'    ],
-        [ 'is',     'pubdate',      '31st May 2010'             ],
-        [ 'is',     'binding',      'Paperback'                 ],
-        [ 'is',     'pages',        436                         ],
-        [ 'like',   'width',        qr/\d+/                     ],
-        [ 'like',   'height',       qr/\d+/                     ],
-        [ 'like',   'weight',       qr/\d+/                     ],
-        [ 'like',   'image_link',   qr|9780718155896.jpg|       ],
-        [ 'like',   'thumb_link',   qr|9780718155896.jpg|       ],
-        [ 'like',   'description',  qr|international tensions are mounting| ],
-        [ 'like',   'book_link',    qr|http://www.booktopia.com.au/the-spy-an-isaac-bell-adventure/prod9780718155896.html| ],
+    '0571239560' => [
+        [ 'is',     'isbn',         '9780571239566'     ],
+        [ 'is',     'isbn10',       '0571239560'        ],
+        [ 'is',     'isbn13',       '9780571239566'     ],
+        [ 'is',     'ean13',        '9780571239566'     ],
+        [ 'is',     'title',        'Touching from a Distance : Ian Curtis and Joy Division'  ],
+        [ 'is',     'author',       'Deborah Curtis'    ],
+        [ 'like',   'publisher',    qr|FABER \S+ FABER| ],
+        [ 'is',     'pubdate',      'October 2007'      ],
+        [ 'is',     'pages',        240                 ],
+        [ 'like',   'image_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|        ],
+        [ 'like',   'thumb_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|        ],
+        [ 'like',   'description',  qr|Ian Curtis left behind a legacy rich in artistic genius| ],
+        [ 'like',   'book_link',    qr|http://www.booktopia.com.au/touching-from-a-distance-ian-curtis-and-joy-division/prod9780571239566.html|               ]
     ],
- 
-    '9781408307557' => [
-        [ 'is',     'pages',        undef                       ],
-        [ 'like',   'width',        qr/\d+/                     ],
-        [ 'like',   'height',       qr/\d+/                     ],
-        [ 'like',   'weight',       qr/\d+/                     ],
+    '9780571239566' => [
+        [ 'is',     'isbn',         '9780571239566'     ],
+        [ 'is',     'isbn10',       '0571239560'        ],
+        [ 'is',     'isbn13',       '9780571239566'     ],
+        [ 'is',     'ean13',        '9780571239566'     ],
+        [ 'is',     'title',        'Touching from a Distance : Ian Curtis and Joy Division'  ],
+        [ 'is',     'author',       'Deborah Curtis'    ],
+        [ 'like',   'publisher',    qr|FABER \S+ FABER| ],
+        [ 'is',     'pubdate',      'October 2007'      ],
+        [ 'is',     'pages',        240                 ],
+        [ 'like',   'image_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|        ],
+        [ 'like',   'thumb_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|        ],
+        [ 'like',   'description',  qr|Ian Curtis left behind a legacy rich in artistic genius| ],
+        [ 'like',   'book_link',    qr|http://www.booktopia.com.au/touching-from-a-distance-ian-curtis-and-joy-division/prod9780571239566.html|               ]
     ],
 );
 
@@ -82,7 +86,7 @@ SKIP: {
     elsif($record->found) {
         ok(0,'Unexpectedly found a non-existent book');
     } else {
-		like($record->error,qr/Failed to find that book|website appears to be unavailable/);
+		like($record->error,qr/Invalid ISBN specified|Failed to find that book|website appears to be unavailable/);
     }
 
     for my $isbn (keys %tests) {
@@ -103,6 +107,7 @@ SKIP: {
             is($record->found_in,$DRIVER);
 
             my $book = $record->book;
+            diag("book=[".$book->{book_link}."]");
             for my $test (@{ $tests{$isbn} }) {
                 if($test->[0] eq 'ok')          { ok(       $book->{$test->[1]},             ".. '$test->[1]' found [$isbn]"); } 
                 elsif($test->[0] eq 'is')       { is(       $book->{$test->[1]}, $test->[2], ".. '$test->[1]' found [$isbn]"); } 

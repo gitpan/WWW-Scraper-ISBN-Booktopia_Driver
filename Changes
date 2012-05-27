@@ -1,5 +1,12 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.13    22/05/2012
+	- updated pattern matching due to page layout changes.
+	- spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+	- META tests no longer require specific versions.
+	- added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
 0.12    16/03/2011
         - updated test with more generic test results.
 

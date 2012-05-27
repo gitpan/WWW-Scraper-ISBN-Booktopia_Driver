@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 #--------------------------------------------------------------------------
 
@@ -77,8 +77,6 @@ a valid page is returned, the following fields are returned via the book hash:
 
 The book_link and image_link refer back to the Booktopia website.
 
-=back
-
 =cut
 
 sub search {
@@ -87,7 +85,16 @@ sub search {
 	$self->found(0);
 	$self->book(undef);
 
-	my $mech = WWW::Mechanize->new();
+    # validate and convert into EAN13 format
+    my $ean = $self->convert_to_ean13($isbn);
+    return $self->handler("Invalid ISBN specified [$isbn]")   
+        if(!$ean || (length $isbn == 13 && $isbn ne $ean)
+                 || (length $isbn == 10 && $isbn ne $self->convert_to_isbn10($ean)));
+
+#print STDERR "\n# isbn=[$isbn] => ean=[$ean]\n";
+    $isbn = $ean;
+
+    my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
 
     eval { $mech->get( SEARCH . $isbn ) };
@@ -119,7 +126,7 @@ sub search {
 	return $self->handler("Failed to find that book on Booktopia website. [$isbn]")
 		if($html =~ m!Sorry, we couldn't find any matches for!si);
     
-#print STDERR "\n# content2=[\n$html\n]\n";
+#print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
     ($data->{publisher})                = $html =~ m!<span class="bold">\s*Publisher:\s*</span>\s*([^<]+)!si;
@@ -128,8 +135,8 @@ sub search {
     $data->{publisher} =~ s!<[^>]+>!!g  if($data->{publisher});
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
-    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au(?:/big)?/\d+/\d+/\d+.jpg)!si;
-    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au\.?/\d+/\d+/\d+.jpg)!si;
+    ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/big/\d+/[-\w]+\.jpg)!si;
+    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/[-\w]+\.jpg)!si;
     ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
     ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
     ($data->{author})                   = $html =~ m!<span class="bold">(?:By|Author):\s*</span><span style="color:#FFFFFF">((?:<a[^>]+href="/search.ep\?author=[^"]+"[^>]*>[^<]+</a>[,\s]*)+)</span><br/>!si;
@@ -200,6 +207,79 @@ sub search {
 	return $self->book;
 }
 
+=item C<convert_to_ean13()>
+
+Given a 10/13 character ISBN, this function will return the correct 13 digit
+ISBN, also known as EAN13.
+
+=item C<convert_to_isbn10()>
+
+Given a 10/13 character ISBN, this function will return the correct 10 digit 
+ISBN.
+
+=back
+
+=cut
+
+sub convert_to_ean13 {
+	my $self = shift;
+    my $isbn = shift;
+    my $prefix;
+
+    return  unless(length $isbn == 10 || length $isbn == 13);
+
+    if(length $isbn == 13) {
+        return  if($isbn !~ /^(978|979)(\d{10})$/);
+        ($prefix,$isbn) = ($1,$2);
+    } else {
+        return  if($isbn !~ /^(\d{10}|\d{9}X)$/);
+        $prefix = '978';
+    }
+
+    my $isbn13 = '978' . $isbn;
+    chop($isbn13);
+    my @isbn = split(//,$isbn13);
+    my ($lsum,$hsum) = (0,0);
+    while(@isbn) {
+        $hsum += shift @isbn;
+        $lsum += shift @isbn;
+    }
+
+    my $csum = ($lsum * 3) + $hsum;
+    $csum %= 10;
+    $csum = 10 - $csum  if($csum != 0);
+
+    return $isbn13 . $csum;
+}
+
+sub convert_to_isbn10 {
+	my $self = shift;
+    my $ean  = shift;
+    my ($isbn,$isbn10);
+
+    return  unless(length $ean == 10 || length $ean == 13);
+
+    if(length $ean == 13) {
+        return  if($ean !~ /^(?:978|979)(\d{9})\d$/);
+        ($isbn,$isbn10) = ($1,$1);
+    } else {
+        return  if($ean !~ /^(\d{9})[\dX]$/);
+        ($isbn,$isbn10) = ($1,$1);
+    }
+
+	return  if($isbn < 0 or $isbn > 999999999);
+
+	my ($csum, $pos, $digit) = (0, 0, 0);
+    for ($pos = 9; $pos > 0; $pos--) {
+        $digit = $isbn % 10;
+        $isbn /= 10;             # Decimal shift ISBN for next time 
+        $csum += ($pos * $digit);
+    }
+    $csum %= 11;
+    $csum = 'X'   if ($csum == 10);
+    return $isbn10 . $csum;
+}
+
 1;
 
 __END__
@@ -226,7 +306,7 @@ RT system (http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Scraper-ISBN-Boo
 However, it would help greatly if you are able to pinpoint problems or even
 supply a patch.
 
-Fixes are dependant upon their severity and my availablity. Should a fix not
+Fixes are dependent upon their severity and my availability. Should a fix not
 be forthcoming, please feel free to (politely) remind me.
 
 =head1 AUTHOR
@@ -236,7 +316,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010,2011 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2012 Barbie for Miss Barbell Productions
 
   This module is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.
