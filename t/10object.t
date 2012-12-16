@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
 
-use lib './t';
 use Test::More tests => 51;
 use WWW::Scraper::ISBN;
 
@@ -27,7 +26,7 @@ my %tests = (
         [ 'like',   'weight',       qr/\d+/                     ],
         [ 'like',   'image_link',   qr|bitter-sea.jpg|          ],
         [ 'like',   'thumb_link',   qr|bitter-sea.jpg|          ],
-        [ 'like',   'description',  qr|A gripping history of the Mediterranean campaigns|           ],
+        [ 'like',   'description',  qr|The Mediterranean Sea lies at the very heart of recent world history|           ],
         [ 'like',   'book_link',    qr|http://www.booktopia.com.au/[^/]+/prod9780007203055.html|    ]
     ],
     '0571239560' => [

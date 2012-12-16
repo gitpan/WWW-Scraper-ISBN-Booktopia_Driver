@@ -1,56 +1,60 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
-0.14	17/06/2012
-	- updated pattern matching due to page layout changes.
-	- updated tests due to data changes.
+0.15    2012-12-16
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
 
-0.13    22/05/2012
-	- updated pattern matching due to page layout changes.
-	- spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
-	- META tests no longer require specific versions.
-	- added minimum perl version (5.006).
+0.14    2012-06-17
+        - updated pattern matching due to page layout changes.
+        - updated tests due to data changes.
+
+0.13    2012-05-22
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
         - reworked Makefile.PL for clarity.
 
-0.12    16/03/2011
+0.12    2011-03-16
         - updated test with more generic test results.
 
-0.11    14/03/2011
+0.11    2011-03-14
         - updated tests due to data change.
 
-0.10    16/02/2011
+0.10    2011-02-16
         - upgraded to Test::CPAN::Meta::JSON for tests.
         - updated tests due to data change.
 
-0.09    14/02/2011
+0.09    2011-02-14
         - updated tests due to data change.
 
-0.08    03/11/2010
+0.08    2010-11-03
         - added further skip test if test books are withdrawn from the site.
 
-0.07    29/10/2010
+0.07    2010-10-29
         - update to author pattern
         - test data update
 
-0.06    07/10/2010
+0.06    2010-10-07
         - further fixes due to changes in page layout.
         - adapted code to cope with weird weights.
         - amended pingtest() in network tests.
 
-0.05    06/10/2010
+0.05    2010-10-06
         - fixed skip count.
         - provided alternate ping test methods.
         - fixes due to changes in page layout.
 
-0.04    15/09/2010
+0.04    2010-09-15
         - reworked test structure, so easier to add sample sets.
 
-0.03	14/09/2010
+0.03    2010-09-14
         - protect against amending undefined strings.
 
-0.02	08/09/2010
+0.02    2010-09-08
         - weight is actually given in grammes not kilogrammes as stated.
         - all matches are now case insensitive.
         - fixed support for ISBN10 searches.
 
-0.01	30/07/2010
+0.01    2010-07-30
         - initial release
