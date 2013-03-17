@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 #--------------------------------------------------------------------------
 
@@ -74,6 +74,7 @@ a valid page is returned, the following fields are returned via the book hash:
   weight        (if known) (in grammes)
   width         (if known) (in millimetres)
   height        (if known) (in millimetres)
+  depth         (if known) (in millimetres)
 
 The book_link and image_link refer back to the Booktopia website.
 
@@ -97,6 +98,8 @@ sub search {
     my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Linux Mozilla' );
 
+#print STDERR "\n# url=[".(SEARCH . $isbn)."]\n";
+
     eval { $mech->get( SEARCH . $isbn ) };
     return $self->handler("Booktopia website appears to be unavailable.")
 	    if($@ || !$mech->success() || !$mech->content());
@@ -107,19 +110,6 @@ sub search {
         $pattern =~ s/.$/./;
     }
 
-    my $content = $mech->content;
-    my ($link) = $content =~ m!"($BAU_URL2$pattern$BAU_URL3)"!s;
-	return $self->handler("Failed to find that book on Booktopia website.")
-	    unless($link);
-
-#print STDERR "\n# content1=[\n$content\n]\n";
-#print STDERR "\n# link1=[$BAU_URL2$pattern$BAU_URL3]\n";
-#print STDERR "\n# link2=[$BAU_URL1$link]\n";
-
-    eval { $mech->get( $BAU_URL1 . $link ) };
-    return $self->handler("Booktopia website appears to be unavailable.")
-	    if($@ || !$mech->success() || !$mech->content());
-
 	# The Book page
     my $html = $mech->content();
 
@@ -129,25 +119,25 @@ sub search {
 #print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
-    ($data->{publisher})                = $html =~ m!<span class="bold">\s*Publisher:\s*</span>\s*([^<]+)!si;
-    ($data->{pubdate})                  = $html =~ m!<span class="bold">\s*Published:\s*</span>\s*([^<]+)!si;
+    ($data->{publisher})                = $html =~ m!<span class="label">\s*Publisher:\s*</span>\s*([^<]+)!si;
+    ($data->{pubdate})                  = $html =~ m!<span class="label">\s*Published:\s*</span>\s*([^<]+)!si;
 
     $data->{publisher} =~ s!<[^>]+>!!g  if($data->{publisher});
     $data->{pubdate} =~ s!\s+! !g       if($data->{pubdate});
 
     ($data->{image})                    = $html =~ m!(http://covers.booktopia.com.au/big/\d+/[-\w]+\.jpg)!si;
-    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/[-\w]+\.jpg)!si;
+    ($data->{thumb})                    = $html =~ m!(http://covers.booktopia.com.au/\d+/\d+/[-\w]+\.jpg)!si;
     ($data->{isbn13})                   = $html =~ m!<b>\s*ISBN:\s*</b>\s*(\d+)!si;
     ($data->{isbn10})                   = $html =~ m!<b>\s*ISBN-10:\s*</b>\s*(\d+)!si;
-    ($data->{author})                   = $html =~ m!<span class="bold">(?:By|Author):\s*</span><span[^>]*>((?:<a[^>]+href="/search.ep\?author=[^"]+"[^>]*>[^<]+</a>[,\s]*)+)</span><br/>!si;
+    ($data->{author})                   = $html =~ m!<div id="contributors">\s*(?:By|Author):\s*(.*?)</div>!si;
     ($data->{title})                    = $html =~ m!<meta property="og:title" content="([^"]+)"!si;
     ($data->{title})                    = $html =~ m!<a href="[^"]+" class="largeLink">([^<]+)</a><br/><br/>!si  unless($data->{title});
-    ($data->{description})              = $html =~ m!<div id="product-description">(.*?)</div>\s*<div id="(?:details|extract)"!si;
-    ($data->{description})              = $html =~ m!<h4>Description:</h4>([^<]+)!si  unless($data->{description});
-    ($data->{binding})                  = $html =~ m!<b>Format:\s*</b>([^<]+)!si;
+    ($data->{description})              = $html =~ m!<div id="description">(.*?)</div>!si;
+    ($data->{binding})                  = $html =~ m!<span class="label">\s*Format:\s*</span>\s*([^<]+)!si;
     ($data->{pages})                    = $html =~ m!<b>\s*Number Of Pages:\s*</b>\s*([\d.]+)!si;
-    ($data->{weight})                   = $html =~ m!<span class="bold">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!si;
-    ($data->{height},$data->{width})    = $html =~ m!<span class="bold">\s*Dimensions \(cm\):\s*</span>([\d.]+)&nbsp;x&nbsp;([\d.]+)!si;
+    ($data->{weight})                   = $html =~ m!<span class="label">\s*Weight \(kg\):\s*</span>\s*([\d.]+)!si;
+    ($data->{height},$data->{width},$data->{depth})
+                                        = $html =~ m!<span class="label">\s*Dimensions \(cm\):\s*</span>([\d.]+)\s*&nbsp;x&nbsp;\s*([\d.]+)\s*&nbsp;x&nbsp;\s*([\d.]+)!si;
 
     # despite it saying Kg (kilogrammes) the weight seems to vary between widely!
     if($data->{weight}) {
@@ -159,15 +149,19 @@ sub search {
     
     $data->{height} = int($data->{height} * 10)     if($data->{height});
     $data->{width}  = int($data->{width}  * 10)     if($data->{width});
+    $data->{depth}  = int($data->{depth}  * 10)     if($data->{depth});
 
-    $data->{author} =~ s!<[^>]+>!!g if($data->{author});
+    if($data->{author}) {
+        $data->{author} =~ s!<br\s*/>!,!g;
+        $data->{author} =~ s!<[^>]+>!!g;
+        $data->{author} =~ s!\s*,\s*!, !g;
+        $data->{author} =~ s!\s*,\s*$!!g;
+    }
+
     if($data->{description}) {
-        $data->{description} =~ s!<div.*?</div>!!s;
-        $data->{description} =~ s!<a .*!!s;
-        $data->{description} =~ s!</?b>!!g;
-        $data->{description} =~ s!<br\s*/>!\n!g;
-        $data->{description} =~ s! +$!!gm;
-        $data->{description} =~ s!\n\n!\n!gs;
+        $data->{description} =~ s!Click on the Google Preview[^<]+!!s;
+        $data->{description} =~ s!<br\s*/?>!\n!gi;
+        $data->{description} =~ s!<[^>]+>!!g;
     }
 
 #use Data::Dumper;
@@ -196,7 +190,9 @@ sub search {
 		'pages'		    => $data->{pages},
 		'weight'		=> $data->{weight},
 		'width'		    => $data->{width},
-		'height'		=> $data->{height}
+		'height'		=> $data->{height},
+		'depth'		    => $data->{depth},
+        'html'          => $html
 	};
 
 #use Data::Dumper;
@@ -316,9 +312,9 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2012 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2013 Barbie for Miss Barbell Productions
 
-  This module is free software; you can redistribute it and/or
+  This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.
 
 =cut
