@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-Scraper-ISBN-Booktopia_Driver.
 
+0.17    2013-03-26
+        - tests changed to reflect website updates.
+
 0.16    2013-03-17
         - exposed depth values.
         - added isbn-check.pl to examples.

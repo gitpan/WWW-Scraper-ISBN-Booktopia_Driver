@@ -2,7 +2,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 56;
+use Test::More tests => 55;
 use WWW::Scraper::ISBN;
 
 ###########################################################
@@ -18,7 +18,6 @@ my %tests = (
         [ 'is',     'ean13',        '9780007203055'             ],
         [ 'like',   'author',       qr/Simon Ball/              ],
         [ 'like',   'title',        qr/Bitter Sea/              ],
-        [ 'like',   'publisher',    qr/HarperCollins/           ],
         [ 'like',   'pubdate',      qr/2010/                    ],
         [ 'is',     'binding',      'Paperback'                 ],
         [ 'is',     'pages',        416                         ],
@@ -58,10 +57,10 @@ my %tests = (
         [ 'is',     'publisher',    undef                       ],
         [ 'is',     'pubdate',      'October 2007'              ],
         [ 'is',     'pages',        240                         ],
-        [ 'is',     'depth',        19                          ],
-        [ 'is',     'width',        126                         ],
-        [ 'is',     'height',       197                         ],
-        [ 'is',     'weight',       208                         ],
+        [ 'like',   'depth',        qr/\d+/                     ],
+        [ 'like',   'width',        qr/\d+/                     ],
+        [ 'like',   'height',       qr/\d+/                     ],
+        [ 'like',   'weight',       qr/\d+/                     ],
         [ 'like',   'image_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|    ],
         [ 'like',   'thumb_link',   qr|touching-from-a-distance-ian-curtis-and-joy-division.jpg|    ],
         [ 'like',   'description',  qr|Ian Curtis left behind a legacy rich in artistic genius|     ],
